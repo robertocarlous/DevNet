@@ -398,30 +398,30 @@ def set_fees(
         "Failed to update all fees"
     )
 
-@registry_app.command("withdraw-fees")
-def withdraw_fees(ctx: typer.Context, to: str = typer.Argument(..., help="Address to withdraw fees to")):
+@registry_app.command("sweep-fees")
+def sweep_fees(ctx: typer.Context):
+    """Sweep all accumulated ETH fees from the registry to the fee router."""
     effective_network, w3, account, console = ctx.obj.get_en_w3_account_console()
     DINModelRegistry_Contract = ctx.obj.get_deployed_din_registry_contract()
-    target_address = w3.to_checksum_address(to)
     build_and_send_tx(
-        ctx, 
-        DINModelRegistry_Contract.functions.withdrawFees(target_address),
-        f"Withdrawing fees to {target_address}",
-        "Fees withdrawn successfully",
-        "Failed to withdraw fees"
+        ctx,
+        DINModelRegistry_Contract.functions.sweepFeesToRouter(),
+        "Sweeping accumulated fees to fee router",
+        "Fees swept successfully",
+        "Failed to sweep fees"
     )
 
 @registry_app.command("set-dao-admin")
-def set_dao_admin(ctx: typer.Context, new_admin: str = typer.Argument(..., help="New DAO admin address")):
+def set_dao_admin(ctx: typer.Context, new_admin: str = typer.Argument(..., help="New owner address")):
     effective_network, w3, account, console = ctx.obj.get_en_w3_account_console()
     DINModelRegistry_Contract = ctx.obj.get_deployed_din_registry_contract()
     target_address = w3.to_checksum_address(new_admin)
     build_and_send_tx(
-        ctx, 
-        DINModelRegistry_Contract.functions.setDAOAdmin(target_address),
-        f"Setting DAO admin to {target_address}",
-        "DAO admin set successfully",
-        "Failed to set DAO admin"
+        ctx,
+        DINModelRegistry_Contract.functions.transferOwnership(target_address),
+        f"Transferring registry ownership to {target_address}",
+        "Ownership transferred successfully",
+        "Failed to transfer ownership"
     )
 
 
